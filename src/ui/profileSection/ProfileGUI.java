@@ -100,11 +100,39 @@ public class ProfileGUI extends Application {
     }
 
     private String getNama(String idUser ) {
-        return "a";
+        String query = "SELECT nameUser FROM studentsdata WHERE idUser  = ?";
+        try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+             PreparedStatement stms = conn.prepareStatement(query)) {
+
+            stms.setString(1, idUser);
+            ResultSet rs = stms.executeQuery();
+            if (rs.next()) {
+                return rs.getString("nameUser");
+            } else {
+                return "Nama tidak ditemukan";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
+        }
     }
 
     private String getNIM(String idUser){
-        return "a";
+        String query = "SELECT idUser FROM studentsdata WHERE idUser = ?";
+        try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+            PreparedStatement stmt = conn.prepareStatement(query)){
+
+            stmt.setString(1, idUser);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+                return rs.getString("idUser");
+            }else{
+                return "NIM tidak ditemukan";
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
+        }
     }
     public static void main(String[] args) {
         launch(args);
