@@ -123,6 +123,16 @@ public class LoginGUI extends Application {
     }
 
     private boolean checkNIM(String NIM){
+        String query = "SELECT * FROM studentsdata WHERE idUser = ?";
+        try(Connection conn = DriverManager.getConnection(dbURL,dbUser,dbPass);
+            PreparedStatement stms = conn.prepareStatement(query)){
+
+            stms.setString(1, NIM);
+            ResultSet rs = stms.executeQuery();
+            return rs.next();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
         return false;
     }
 
