@@ -1,10 +1,14 @@
 package ui.profileSection;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -28,9 +32,73 @@ public class ProfileGUI extends Application {
         this.idUser  = idUser ;
     }
 
+    public ObservableList<Return> masterData = FXCollections.observableArrayList();
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Data Diri");
+
+        HBox mainroot = new HBox(20);
+        mainroot.setPadding(new Insets(40));
+        mainroot.setAlignment(Pos.TOP_CENTER);
+        mainroot.setStyle("-fx-background-color : #60B5FF");
+
+        TableView<Return> tableView = new TableView<>();
+        tableView.setPrefWidth(750);
+
+        //columns
+        TableColumn<Return, Integer> idBorCol = new TableColumn<>("ID PINJAM");
+        idBorCol.setCellValueFactory(new PropertyValueFactory<>("idPeminjaman"));
+        idBorCol.setPrefWidth(100);
+
+        TableColumn<Return, String> idBukuCol = new TableColumn<>("ID BUKU");
+        idBukuCol.setCellValueFactory(new PropertyValueFactory<>("idBuku"));
+        idBukuCol.setPrefWidth(100);
+
+        TableColumn<Return, Date> tglPinjamCol = new TableColumn<>("Tanggal Pinjam");
+        tglPinjamCol.setCellValueFactory(new PropertyValueFactory<>("tanggalPeminjaman"));
+        tglPinjamCol.setPrefWidth(150);
+
+        TableColumn<Return, String> judulCol = new TableColumn<>("Judul");
+        judulCol.setCellValueFactory(new PropertyValueFactory<>("judul"));
+        judulCol.setPrefWidth(200);
+
+        TableColumn<Return, String> penulisCol = new TableColumn<>("Penulis");
+        penulisCol.setCellValueFactory(new PropertyValueFactory<>("penulis"));
+        penulisCol.setPrefWidth(100);
+
+        TableColumn<Return, Void> returnCol = new TableColumn<>("Kembalikan");
+        returnCol.setPrefWidth(80);
+        returnCol.setCellFactory(param -> new TableCell<>() {
+            private final Button btn = new Button("Kembalikan");
+
+            {
+                btn.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold;");
+                btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #FFECDB; -fx-text-fill: black; -fx-font-weight: bold;"));
+                btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold;"));
+
+                btn.setOnAction(e -> {
+
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty){
+                super.updateItem(item, empty);
+                if(empty){
+                    setGraphic(null);
+                }else{
+                    setGraphic(btn);
+                }
+            }
+        });
+
+
+
+        tableView.getColumns().addAll(idBorCol, idBukuCol, tglPinjamCol, judulCol, penulisCol, returnCol);
+        loadBookFromDB();
+        FilteredList<Return> filteredData = new FilteredList<>(masterData, b -> true);
+        tableView.setItems(filteredData);
+
         VBox root = new VBox(20);
         root.setPadding(new Insets(40));
         root.setAlignment(Pos.TOP_CENTER);
@@ -69,31 +137,18 @@ public class ProfileGUI extends Application {
         pinjamBukuButton.setOnMouseEntered(e -> pinjamBukuButton.setStyle("-fx-background-color: #FFECDB; -fx-text-fill: black; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
         pinjamBukuButton.setOnMouseExited(e -> pinjamBukuButton.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
 
-        //Button kembalikan buku
         Button kembaliButton = new Button("Keluar");
         kembaliButton.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;");
         kembaliButton.setOnMouseEntered(e -> kembaliButton.setStyle("-fx-background-color: #FFECDB; -fx-text-fill: black; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
         kembaliButton.setOnMouseExited(e -> kembaliButton.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
 
         pinjamBukuButton.setOnAction(e -> {
-            //displaybook display = new displaybook();
-            //display.setMhsQuery(idUser);
-           // display.start(new Stage());
             primaryStage.close();
         });
 
-        kembaliButton.setOnAction(e -> {
-            LoginGUI login = new LoginGUI();
-            login.start(new Stage());
-            primaryStage.close();
-        });
-
-        HBox buttonBox = new HBox(20);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(pinjamBukuButton, kembaliButton);
-
-        root.getChildren().addAll(titleLabel, grid, buttonBox);
-        Scene scene = new Scene(root, 450, 350);
+        root.getChildren().addAll(titleLabel, grid, pinjamBukuButton, kembaliButton);
+        mainroot.getChildren().addAll(root, tableView);
+        Scene scene = new Scene(mainroot, 1200, 800);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -134,7 +189,53 @@ public class ProfileGUI extends Application {
             return "Error: " + e.getMessage();
         }
     }
-    public static void main(String[] args) {
-        launch(args);
+
+    private void loadBookFromDB() {
+        masterData.clear();
+        String queryPeminjaman = "SELECT * FROM peminjaman WHERE idUser = ?";
+        String queryBook1 = "SELECT * FROM informaticbook WHERE idBuku = ?";
+        String queryBook2 = "SELECT * FROM machinebook WHERE idBuku = ?";
+
+        try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass)) {
+            try (PreparedStatement ps = conn.prepareStatement(queryPeminjaman)) {
+                ps.setString(1, idUser);
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    int idPinjam = rs.getInt("idpeminjaman");
+                    String idBuku = rs.getString("idBuku");
+                    Date tglPinjam = rs.getDate("tanggalpinjam");
+
+                    String judul = "", penulis = "";
+
+                    // Coba cari di informaticbook
+                    try (PreparedStatement psBook = conn.prepareStatement(queryBook1)) {
+                        psBook.setString(1, idBuku);
+                        ResultSet rsBook = psBook.executeQuery();
+                        if (rsBook.next()) {
+                            judul = rsBook.getString("judul");
+                            penulis = rsBook.getString("penulis");
+                        }
+                    }
+
+                    // Kalau tidak ditemukan, coba di machinebook
+                    if (judul.isEmpty()) {
+                        try (PreparedStatement psBook = conn.prepareStatement(queryBook2)) {
+                            psBook.setString(1, idBuku);
+                            ResultSet rsBook = psBook.executeQuery();
+                            if (rsBook.next()) {
+                                judul = rsBook.getString("judul");
+                                penulis = rsBook.getString("penulis");
+                            }
+                        }
+                    }
+                    masterData.add(new Return(idPinjam,idBuku,tglPinjam,judul,penulis));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

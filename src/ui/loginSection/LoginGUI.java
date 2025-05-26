@@ -9,6 +9,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import ui.profileSection.ProfileGUI;
 
 
 import java.sql.*;
@@ -100,6 +101,9 @@ public class LoginGUI extends Application {
             if(checkNIM(NIM)){
                 announce.setTextFill(Color.web("#2ecc71"));
                 announce.setText("Login successful!");
+                ProfileGUI userLogin = new ProfileGUI(NIM);
+                userLogin.start(new Stage());
+
                 primaryStage.close();
             }else{
                 announce.setTextFill(Color.web("#f44336"));

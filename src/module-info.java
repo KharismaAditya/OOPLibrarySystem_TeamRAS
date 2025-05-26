@@ -5,4 +5,6 @@ module OOPLibrarySystem.TeamRAS {
 
 
     exports ui.loginSection;
+    exports ui.profileSection;
+    exports ui.programSection.dataBook;
 }
