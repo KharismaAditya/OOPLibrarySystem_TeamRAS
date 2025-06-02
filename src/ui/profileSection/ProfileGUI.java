@@ -143,6 +143,15 @@ public class ProfileGUI extends Application {
         kembaliButton.setOnMouseExited(e -> kembaliButton.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
 
         pinjamBukuButton.setOnAction(e -> {
+            displaybook display = new displaybook();
+            display.setMhsQuery(idUser);
+            display.start(new Stage());
+            primaryStage.close();
+        });
+
+        kembaliButton.setOnAction(e -> {
+            LoginGUI login = new LoginGUI();
+            login.start(new Stage());
             primaryStage.close();
         });
 

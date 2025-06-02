@@ -125,16 +125,7 @@ public class displaybook extends Application {
             });
         });
 
-        Button back = new Button("BACK");
-        back.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;");
-        back.setOnMouseExited(e -> back.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
-        back.setOnMouseEntered(e -> back.setStyle("-fx-background-color: #FFECDB; -fx-text-fill: black; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
-
-        back.setOnAction(e -> {
-            ProfileGUI profil = new ProfileGUI(getMhsQuery());
-            profil.start(new Stage());
-            primaryStage.close();
-        });
+        Button back = getButton(primaryStage);
 
         tableView.setItems(filteredData);
 
@@ -146,6 +137,20 @@ public class displaybook extends Application {
         primaryStage.show();
     }
 
+    private Button getButton(Stage primaryStage) {
+        Button back = new Button("BACK");
+        back.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;");
+        back.setOnMouseExited(e -> back.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
+        back.setOnMouseEntered(e -> back.setStyle("-fx-background-color: #FFECDB; -fx-text-fill: black; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
+
+        back.setOnAction(e -> {
+            ProfileGUI profil = new ProfileGUI(getMhsQuery());
+            profil.start(new Stage());
+            primaryStage.close();
+        });
+        return back;
+    }
+
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -155,13 +160,116 @@ public class displaybook extends Application {
     }
 
     private void borrowBook(Book book) {
+        if (book.getStok() <= 0) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Stok Habis");
+            alert.setHeaderText(null);
+            alert.setContentText("Maaf, stok buku \"" + book.getJudul() + "\" habis.");
+            alert.showAndWait();
+            return;
+        }
 
+        String idMahasiswa = getMhsQuery();
+
+        String checkExistingBorrowQuery =
+                "SELECT COUNT(*) FROM peminjaman WHERE idUser = ? AND idBuku = ? AND tanggalKembali IS NULL";
+
+        String insertPeminjamanQuery =
+                "INSERT INTO peminjaman (idUser, idBuku) VALUES (?, ?)";
+
+        String updateStokInformatika =
+                "UPDATE informaticbook SET stok = stok - 1 WHERE idBuku = ? AND stok > 0";
+
+        String updateStokMesin =
+                "UPDATE machinebook SET stok = stok - 1 WHERE idBuku = ? AND stok > 0";
+
+        try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass)) {
+            conn.setAutoCommit(false);
+
+            try {
+                try (PreparedStatement checkStmt = conn.prepareStatement(checkExistingBorrowQuery)) {
+                    checkStmt.setString(1, idMahasiswa);
+                    checkStmt.setString(2, book.getIdBuku());
+                    ResultSet rs = checkStmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        conn.rollback();
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Sudah Meminjam");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Anda sudah meminjam buku \"" + book.getJudul() + "\" dan belum mengembalikannya.");
+                        alert.showAndWait();
+                        return;
+                    }
+                }
+
+                try (PreparedStatement psStok1 = conn.prepareStatement(updateStokInformatika)) {
+                    psStok1.setString(1, book.getIdBuku());
+                    psStok1.executeUpdate();
+                }
+                try (PreparedStatement psStok2 = conn.prepareStatement(updateStokMesin)) {
+                    psStok2.setString(1, book.getIdBuku());
+                    psStok2.executeUpdate();
+                }
+
+                try (PreparedStatement psInsert = conn.prepareStatement(insertPeminjamanQuery)) {
+                    psInsert.setString(1, idMahasiswa);
+                    psInsert.setString(2, book.getIdBuku());
+                    psInsert.executeUpdate();
+                }
+
+                conn.commit();
+                book.setStok(book.getStok() - 1); // update tampilan TableView
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Peminjaman Berhasil");
+                alert.setHeaderText(null);
+                alert.setContentText("Anda berhasil meminjam buku \"" + book.getJudul() + "\".");
+                alert.showAndWait();
+                loadBooksFromDB();
+
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                showError("Terjadi kesalahan saat meminjam buku.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showError("Tidak dapat terhubung ke database.");
+        }
     }
 
 
 
     private void loadBooksFromDB() {
+        masterData.clear();
+        String queryInformatika = "SELECT * FROM informaticbook";
+        String queryMesin = "SELECT * FROM machinebook";
 
+        try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass)) {
+            try(PreparedStatement ps = conn.prepareStatement(queryInformatika);
+                ResultSet rs = ps.executeQuery()) {
+                while(rs.next()){
+                    String judul = rs.getString("judul");
+                    String penulis = rs.getString("penulis");
+                    int stok = rs.getInt("stok");
+                    String idBuku = rs.getString("idBuku");
+                    masterData.add(new Book(judul, penulis, stok, idBuku));
+                }
+            }
+            try(PreparedStatement ps = conn.prepareStatement(queryMesin);
+                ResultSet rs = ps.executeQuery()) {
+                while(rs.next()){
+                    String judul = rs.getString("judul");
+                    String penulis = rs.getString("penulis");
+                    int stok = rs.getInt("stok");
+                    String idBuku = rs.getString("idBuku");
+                    masterData.add(new Book(judul, penulis, stok, idBuku));
+                }
+            }
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
     }
 }
 
