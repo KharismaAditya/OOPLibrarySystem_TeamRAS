@@ -5,6 +5,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -32,9 +34,9 @@ public class LoginGUI extends Application {
         root.setStyle("-fx-background-color : #60B5FF");
 
         //WELCOME BACK LABEL
-        Label titleLabel = new Label("Welcome Back");
+        Label titleLabel = new Label("WELCOME BACK");
         titleLabel.setTextFill(Color.BLACK);
-        titleLabel.setFont(Font.font("Tahoma", 30));
+        titleLabel.setFont(Font.font("Consolas", 30));
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -45,7 +47,8 @@ public class LoginGUI extends Application {
         //PERPUSTAKAAN Label
         Label perpusLabel = new Label("---PERPUSTAKAAN UMM---");
         perpusLabel.setTextFill(Color.BLACK);
-        perpusLabel.setFont(Font.font("Impact", 14));
+        perpusLabel.setFont(Font.font("Georgia", 14));
+
 
         //NIM component
         Label nimLabel = new Label("NIM: ");

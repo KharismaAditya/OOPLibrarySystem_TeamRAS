@@ -106,7 +106,7 @@ public class ProfileGUI extends Application {
 
         Label titleLabel = new Label("SELAMAT DATANG");
         titleLabel.setTextFill(Color.BLACK);
-        titleLabel.setFont(Font.font("Impact", 28));
+        titleLabel.setFont(Font.font("Consolas", 28));
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -157,7 +157,7 @@ public class ProfileGUI extends Application {
 
         root.getChildren().addAll(titleLabel, grid, pinjamBukuButton, kembaliButton);
         mainroot.getChildren().addAll(root, tableView);
-        Scene scene = new Scene(mainroot, 1200, 800);
+        Scene scene = new Scene(mainroot, 1200, 600);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

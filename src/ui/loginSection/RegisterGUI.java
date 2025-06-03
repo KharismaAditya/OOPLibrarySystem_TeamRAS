@@ -29,7 +29,7 @@ public class RegisterGUI extends Application {
         //REGISTER LABEL
         Label titleLabel = new Label("MAKE NEW ACCOUNT");
         titleLabel.setTextFill(Color.BLACK);
-        titleLabel.setFont(Font.font("Tahoma", 30));
+        titleLabel.setFont(Font.font("Consolas", 30));
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -39,7 +39,7 @@ public class RegisterGUI extends Application {
 
         Label perpusLabel = new Label("---PERPUSTAKAAN UMM---");
         perpusLabel.setTextFill(Color.BLACK);
-        perpusLabel.setFont(Font.font("Impact", 14));
+        perpusLabel.setFont(Font.font("Georgia", 14));
 
         //NEW NIM component
         Label newNimLabel = new Label("Insert your NIM: ");
