@@ -77,7 +77,9 @@ public class ProfileGUI extends Application {
                 btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold;"));
 
                 btn.setOnAction(e -> {
-
+                    Return book = getTableView().getItems().get(getIndex());
+                    kembaliBuku(book);
+                    loadBookFromDB();
                 });
             }
 
@@ -245,6 +247,35 @@ public class ProfileGUI extends Application {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void kembaliBuku(Return book){
+        String peminjamanUpdate = "DELETE FROM peminjaman WHERE idBuku = ?";
+        String updateStokInfor = "UPDATE informaticbook SET stok = stok +1 WHERE idBuku = ?";
+        String updateStokMachine = "UPDATE machinebook SEt stok = stok + 1 WHERE idBuku = ?";
+
+        try(Connection conn = DriverManager.getConnection(dbURL,dbUser,dbPass)){
+            conn.setAutoCommit(false);
+
+            try(PreparedStatement pUp = conn.prepareStatement(peminjamanUpdate)){
+                pUp.setString(1, book.getIdBuku());
+                pUp.executeUpdate();
+            }
+
+            try (PreparedStatement hInfor = conn.prepareStatement(updateStokInfor)){
+                hInfor.setString(1, book.getIdBuku());
+                hInfor.executeUpdate();
+            }
+
+            try (PreparedStatement hMachine = conn.prepareStatement(updateStokMachine)){
+                hMachine.setString(1, book.getIdBuku());
+                hMachine.executeUpdate();
+            }
+            conn.commit();
+
+        }catch (SQLException e){
+            e.printStackTrace();
         }
     }
 }
