@@ -141,6 +141,11 @@ public class RegisterGUI extends Application {
                 announce.setTextFill(Color.web("#2ecc71"));
                 announce.setText("Profile added successfully");
 
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Buat akun berhasil");
+                alert.setHeaderText(null);
+                alert.setContentText("Profil Ada sudah terdaftar");
+                alert.showAndWait();
             }
         }catch (SQLException e){
             e.printStackTrace();

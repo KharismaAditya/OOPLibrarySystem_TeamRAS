@@ -39,7 +39,7 @@ public class ProfileGUI extends Application {
 
         HBox mainroot = new HBox(20);
         mainroot.setPadding(new Insets(40));
-        mainroot.setAlignment(Pos.TOP_CENTER);
+        mainroot.setAlignment(Pos.TOP_LEFT);
         mainroot.setStyle("-fx-background-color : #60B5FF");
 
         TableView<Return> tableView = new TableView<>();
@@ -79,6 +79,11 @@ public class ProfileGUI extends Application {
                 btn.setOnAction(e -> {
                     Return book = getTableView().getItems().get(getIndex());
                     kembaliBuku(book);
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Pengembalian Berhasil");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Anda berhasil mengembalikan buku \"" + book.getJudul() + "\".");
+                    alert.showAndWait();
                     loadBookFromDB();
                 });
             }
@@ -273,6 +278,7 @@ public class ProfileGUI extends Application {
                 hMachine.executeUpdate();
             }
             conn.commit();
+
 
         }catch (SQLException e){
             e.printStackTrace();
