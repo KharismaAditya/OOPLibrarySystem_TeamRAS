@@ -29,7 +29,7 @@ public class RegisterGUI extends Application {
         //REGISTER LABEL
         Label titleLabel = new Label("MAKE NEW ACCOUNT");
         titleLabel.setTextFill(Color.BLACK);
-        titleLabel.setFont(Font.font("Consolas", 30));
+        titleLabel.setFont(Font.font("Tahoma", 30));
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -39,7 +39,7 @@ public class RegisterGUI extends Application {
 
         Label perpusLabel = new Label("---PERPUSTAKAAN UMM---");
         perpusLabel.setTextFill(Color.BLACK);
-        perpusLabel.setFont(Font.font("Georgia", 14));
+        perpusLabel.setFont(Font.font("Impact", 14));
 
         //NEW NIM component
         Label newNimLabel = new Label("Insert your NIM: ");
@@ -53,14 +53,32 @@ public class RegisterGUI extends Application {
         TextField newNameField = new TextField();
         newNameField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
 
+        //NEW EMAIL component
+        Label newEmailLabel = new Label("Insert your Email: ");
+        newEmailLabel.setTextFill(Color.BLACK);
+        TextField newEmailField = new TextField();
+        newEmailField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
+
+        //NEW DEPARTMENT component
+        Label newDepLabel = new Label("Insert your DEPARTMENT: ");
+        newDepLabel.setTextFill(Color.BLACK);
+        TextField newDepField = new TextField();
+        newDepField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
+
 
         grid.add(newNimLabel, 0, 0);
         grid.add(newNimField, 1, 0);
         grid.add(newNameLabel, 0, 1);
         grid.add(newNameField, 1, 1);
+        grid.add(newEmailLabel, 0, 2);
+        grid.add(newEmailField, 1, 2);
+        grid.add(newDepLabel, 0, 3);
+        grid.add(newDepField, 1, 3);
 
         GridPane.setHgrow(newNimField, Priority.ALWAYS);
-        GridPane.setHgrow(newNameField, Priority.ALWAYS);
+        GridPane.setHgrow(newEmailField, Priority.ALWAYS);
+        GridPane.setHgrow(newEmailField, Priority.ALWAYS);
+        GridPane.setHgrow(newDepField, Priority.ALWAYS);
 
         //ANNOUNCE
         Label announce = new Label();
@@ -93,10 +111,12 @@ public class RegisterGUI extends Application {
 
         addButton.setOnAction(e-> {
             String NIM = newNimField.getText();
-            String Nama = newNameField.getText();
+            String Nama = newEmailField.getText();
+            String email = newEmailField.getText();
+            String department = newDepField.getText();
 
             if(!checkUser(NIM)){
-                addUser(NIM, Nama, announce);
+                addUser(NIM, Nama, email, department, announce);
             }else {
                 announce.setTextFill(Color.web("#f44336"));
                 announce.setText("NIM Already used.");
@@ -109,7 +129,7 @@ public class RegisterGUI extends Application {
         });
 
         root.getChildren().addAll(titleLabel, perpusLabel, grid, announce, gridButton);
-        Scene scene = new Scene(root, 450, 350);
+        Scene scene = new Scene(root, 450, 450);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -129,23 +149,21 @@ public class RegisterGUI extends Application {
         return false;
     }
 
-    private void addUser(String nim, String nama, Label announce){
-        String query = "INSERT INTO studentsdata (idUser, nameUser) VALUES (?, ?)";
+    private void addUser(String nim, String nama, String email, String department, Label announce){
+        String query = "INSERT INTO studentsdata (idUser, nameUser, email, jurusan) VALUES (?, ?, ?, ?)";
         try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
             PreparedStatement stmt = conn.prepareStatement(query)){
             stmt.setString(1, nim);
             stmt.setString(2, nama);
+            stmt.setString(3, email);
+            stmt.setString(4, department);
+
             int rowInserted = stmt.executeUpdate();
 
             if(rowInserted > 0){
                 announce.setTextFill(Color.web("#2ecc71"));
                 announce.setText("Profile added successfully");
 
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Buat akun berhasil");
-                alert.setHeaderText(null);
-                alert.setContentText("Profil Ada sudah terdaftar");
-                alert.showAndWait();
             }
         }catch (SQLException e){
             e.printStackTrace();
