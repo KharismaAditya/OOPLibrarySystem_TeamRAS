@@ -39,7 +39,7 @@ public class ProfileGUI extends Application {
 
         HBox mainroot = new HBox(20);
         mainroot.setPadding(new Insets(40));
-        mainroot.setAlignment(Pos.TOP_LEFT);
+        mainroot.setAlignment(Pos.TOP_CENTER);
         mainroot.setStyle("-fx-background-color : #60B5FF");
 
         TableView<Return> tableView = new TableView<>();
@@ -79,11 +79,6 @@ public class ProfileGUI extends Application {
                 btn.setOnAction(e -> {
                     Return book = getTableView().getItems().get(getIndex());
                     kembaliBuku(book);
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Pengembalian Berhasil");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Anda berhasil mengembalikan buku \"" + book.getJudul() + "\".");
-                    alert.showAndWait();
                     loadBookFromDB();
                 });
             }
@@ -113,7 +108,7 @@ public class ProfileGUI extends Application {
 
         Label titleLabel = new Label("SELAMAT DATANG");
         titleLabel.setTextFill(Color.BLACK);
-        titleLabel.setFont(Font.font("Consolas", 28));
+        titleLabel.setFont(Font.font("Impact", 28));
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -132,10 +127,24 @@ public class ProfileGUI extends Application {
         Label nimValueLabel = new Label(getNIM(idUser));
         nimValueLabel.setTextFill(Color.BLACK);
 
+        Label emailLabel = new Label("EMAIL: ");
+        emailLabel.setTextFill(Color.BLACK);
+        Label emailValueLabel = new Label(getEmail(idUser));
+        emailValueLabel.setTextFill(Color.BLACK);
+
+        Label departLabel = new Label("Jurusan: ");
+        departLabel.setTextFill(Color.BLACK);
+        Label departValueLabel = new Label(getDepart(idUser));
+        departValueLabel.setTextFill(Color.BLACK);
+
         grid.add(namaLabel, 0, 0);
         grid.add(namaValueLabel,1, 0 );
         grid.add(nimLabel, 0, 1);
         grid.add(nimValueLabel, 1, 1);
+        grid.add(emailLabel, 0, 2);
+        grid.add(emailValueLabel, 1, 2);
+        grid.add(departLabel, 0, 3);
+        grid.add(departValueLabel, 1, 3);
 
 
         //Button pinjam buku
@@ -149,16 +158,16 @@ public class ProfileGUI extends Application {
         kembaliButton.setOnMouseEntered(e -> kembaliButton.setStyle("-fx-background-color: #FFECDB; -fx-text-fill: black; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
         kembaliButton.setOnMouseExited(e -> kembaliButton.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
 
+        kembaliButton.setOnAction(e ->{
+            LoginGUI login = new LoginGUI();
+            login.start(new Stage());
+            primaryStage.close();
+        });
+
         pinjamBukuButton.setOnAction(e -> {
             displaybook display = new displaybook();
             display.setMhsQuery(idUser);
             display.start(new Stage());
-            primaryStage.close();
-        });
-
-        kembaliButton.setOnAction(e -> {
-            LoginGUI login = new LoginGUI();
-            login.start(new Stage());
             primaryStage.close();
         });
 
@@ -206,6 +215,41 @@ public class ProfileGUI extends Application {
         }
     }
 
+    private String getEmail(String idUser){
+        String query = "SELECT email FROM studentsdata WHERE idUser  = ?";
+        try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+             PreparedStatement stms = conn.prepareStatement(query)) {
+
+            stms.setString(1, idUser);
+            ResultSet rs = stms.executeQuery();
+            if (rs.next()) {
+                return rs.getString("email");
+            } else {
+                return "Email tidak ditemukan";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
+        }
+    }
+
+    private String getDepart(String idUser){
+        String query = "SELECT jurusan FROM studentsdata WHERE idUser  = ?";
+        try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+             PreparedStatement stms = conn.prepareStatement(query)) {
+
+            stms.setString(1, idUser);
+            ResultSet rs = stms.executeQuery();
+            if (rs.next()) {
+                return rs.getString("jurusan");
+            } else {
+                return "Jurusan tidak ditemukan";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
+        }
+    }
     private void loadBookFromDB() {
         masterData.clear();
         String queryPeminjaman = "SELECT * FROM peminjaman WHERE idUser = ?";
@@ -278,7 +322,6 @@ public class ProfileGUI extends Application {
                 hMachine.executeUpdate();
             }
             conn.commit();
-
 
         }catch (SQLException e){
             e.printStackTrace();
