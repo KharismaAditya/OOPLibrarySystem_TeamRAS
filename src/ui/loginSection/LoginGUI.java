@@ -1,18 +1,18 @@
 package ui.loginSection;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import ui.adminSection.*;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import ui.profileSection.ProfileGUI;
-
 
 import java.sql.*;
 
@@ -31,7 +31,16 @@ public class LoginGUI extends Application {
         VBox root = new VBox(20);
         root.setPadding(new Insets(40));
         root.setAlignment(Pos.TOP_CENTER);
-        root.setStyle("-fx-background-color : #60B5FF");
+
+
+        StackPane mainroot = new StackPane();
+
+        Image bg = new Image("loginpane.jpg");
+        ImageView bgIV = new ImageView(bg);
+        bgIV.setFitWidth(450);
+        bgIV.setFitHeight(450);
+        bgIV.setPreserveRatio(false);
+        bgIV.setOpacity(0.4);
 
         //WELCOME BACK LABEL
         Label titleLabel = new Label("WELCOME BACK");
@@ -47,12 +56,17 @@ public class LoginGUI extends Application {
         //PERPUSTAKAAN Label
         Label perpusLabel = new Label("---PERPUSTAKAAN UMM---");
         perpusLabel.setTextFill(Color.BLACK);
-        perpusLabel.setFont(Font.font("Georgia", 14));
+        perpusLabel.setFont(Font.font("Impact", 14));
+
+        Image logo = new Image("logo.png");
+        ImageView logoView = new ImageView(logo);
+        logoView.setFitHeight(80);
+        logoView.setPreserveRatio(true);
 
 
         //NIM component
         Label nimLabel = new Label("NIM: ");
-        nimLabel.setTextFill(Color.BLACK);
+        nimLabel.setTextFill(Color.BLACK);nimLabel.setFont(Font.font("Impact", 12));
         TextField nimField = new TextField();
         nimField.setPromptText("Enter your NIM");nimField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8;");
 
@@ -97,7 +111,14 @@ public class LoginGUI extends Application {
                 return;
             }
 
+
             if(NIM.equalsIgnoreCase("Admin200")){
+                adminClassManage admin = new adminClassManage();
+                try {
+                    admin.start(new Stage());
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
                 primaryStage.close();
             }
 
@@ -105,8 +126,8 @@ public class LoginGUI extends Application {
                 announce.setTextFill(Color.web("#2ecc71"));
                 announce.setText("Login successful!");
                 ProfileGUI userLogin = new ProfileGUI(NIM);
-                userLogin.start(new Stage());
 
+                userLogin.start(new Stage());
                 primaryStage.close();
             }else{
                 announce.setTextFill(Color.web("#f44336"));
@@ -117,13 +138,14 @@ public class LoginGUI extends Application {
         });
 
         regButton.setOnAction(e -> {
-            RegisterGUI reg = new RegisterGUI();
-            reg.start(new Stage());
+            RegisterGUI registerGUI = new RegisterGUI();
+            registerGUI.start(new Stage());
             primaryStage.close();
         });
 
-        root.getChildren().addAll(titleLabel,perpusLabel,grid,announce,gridButton);
-        Scene scene = new Scene(root,450,350);
+        root.getChildren().addAll(bgIV,titleLabel,perpusLabel,logoView,grid,announce,gridButton);
+        mainroot.getChildren().addAll(bgIV, root);
+        Scene scene = new Scene(mainroot,450,450);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

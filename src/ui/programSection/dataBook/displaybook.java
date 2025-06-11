@@ -10,6 +10,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -26,12 +28,12 @@ public class displaybook extends Application {
     private static final String dbPass = "a2001234";
     private String mhsQuery;
 
-    public String getMhsQuery() {
+    public String getMhsQuery(){
         return mhsQuery;
     }
 
-    public void setMhsQuery(String mhsQuery) {
-        this.mhsQuery = mhsQuery;
+    public void setMhsQuery(String nim){
+        this.mhsQuery = nim;
     }
 
     private ObservableList<Book> masterData = FXCollections.observableArrayList();
@@ -44,7 +46,6 @@ public class displaybook extends Application {
         VBox root = new VBox(15);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.TOP_CENTER);
-        root.setStyle("-fx-background-color: #60B5FF;");
 
         Label titleLabel = new Label("Daftar Buku");
         titleLabel.setFont(Font.font("Tahoma", 24));
@@ -125,19 +126,6 @@ public class displaybook extends Application {
             });
         });
 
-        Button back = getButton(primaryStage);
-
-        tableView.setItems(filteredData);
-
-        root.getChildren().addAll(titleLabel, searchField, tableView, back);
-
-        Scene scene = new Scene(root, 750, 650);
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
-    }
-
-    private Button getButton(Stage primaryStage) {
         Button back = new Button("BACK");
         back.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;");
         back.setOnMouseExited(e -> back.setStyle("-fx-background-color: #FF9149; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30 10 30; -fx-background-radius: 5;"));
@@ -148,7 +136,25 @@ public class displaybook extends Application {
             profil.start(new Stage());
             primaryStage.close();
         });
-        return back;
+
+        tableView.setItems(filteredData);
+
+        root.getChildren().addAll(titleLabel, searchField, tableView, back);
+
+
+        ImageView bgIV = new ImageView("displaybook.png");
+        bgIV.setFitWidth(750);
+        bgIV.setFitHeight(650);
+        bgIV.setPreserveRatio(true);
+        bgIV.setOpacity(0.8);
+
+        StackPane mainroot = new StackPane();
+        mainroot.getChildren().addAll(bgIV, root);
+
+        Scene scene = new Scene(mainroot, 750, 650);
+        primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
+        primaryStage.show();
     }
 
     private void showError(String message) {

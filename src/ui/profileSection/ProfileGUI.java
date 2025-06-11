@@ -9,6 +9,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -38,9 +40,8 @@ public class ProfileGUI extends Application {
         primaryStage.setTitle("Data Diri");
 
         HBox mainroot = new HBox(20);
-        mainroot.setPadding(new Insets(40));
+        mainroot.setPadding(new Insets(40,10,40,10));
         mainroot.setAlignment(Pos.TOP_CENTER);
-        mainroot.setStyle("-fx-background-color : #60B5FF");
 
         TableView<Return> tableView = new TableView<>();
         tableView.setPrefWidth(750);
@@ -101,14 +102,18 @@ public class ProfileGUI extends Application {
         FilteredList<Return> filteredData = new FilteredList<>(masterData, b -> true);
         tableView.setItems(filteredData);
 
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(40));
+        VBox root = new VBox(40);
         root.setAlignment(Pos.TOP_CENTER);
-        root.setStyle("-fx-background-color : #60B5FF");
+        root.setPadding(new Insets(0,70,0,0));
 
         Label titleLabel = new Label("SELAMAT DATANG");
         titleLabel.setTextFill(Color.BLACK);
         titleLabel.setFont(Font.font("Impact", 28));
+
+        Image userImage = new Image("user.png");
+        ImageView userIV = new ImageView(userImage);
+        userIV.setFitHeight(80);
+        userIV.setPreserveRatio(true);
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -118,24 +123,24 @@ public class ProfileGUI extends Application {
 
         //Nama component
         Label namaLabel = new Label("Nama: ");
-        namaLabel.setTextFill(Color.BLACK);
+        namaLabel.setTextFill(Color.BLACK);namaLabel.setFont(Font.font("Georgia", 12));
         Label namaValueLabel = new Label(getNama(idUser ));
-        namaValueLabel.setTextFill(Color.BLACK);
+        namaValueLabel.setTextFill(Color.BLACK);namaValueLabel.setFont(Font.font("Georgia", 12));
 
         Label nimLabel = new Label("NIM: ");
-        nimLabel.setTextFill(Color.BLACK);
+        nimLabel.setTextFill(Color.BLACK);nimLabel.setFont(Font.font("Georgia", 12));
         Label nimValueLabel = new Label(getNIM(idUser));
-        nimValueLabel.setTextFill(Color.BLACK);
+        nimValueLabel.setTextFill(Color.BLACK);nimValueLabel.setFont(Font.font("Georgia", 12));
 
         Label emailLabel = new Label("EMAIL: ");
-        emailLabel.setTextFill(Color.BLACK);
+        emailLabel.setTextFill(Color.BLACK);emailLabel.setFont(Font.font("Georgia", 12));
         Label emailValueLabel = new Label(getEmail(idUser));
-        emailValueLabel.setTextFill(Color.BLACK);
+        emailValueLabel.setTextFill(Color.BLACK);emailValueLabel.setFont(Font.font("Georgia", 12));
 
         Label departLabel = new Label("Jurusan: ");
-        departLabel.setTextFill(Color.BLACK);
+        departLabel.setTextFill(Color.BLACK);departLabel.setFont(Font.font("Georgia", 12));
         Label departValueLabel = new Label(getDepart(idUser));
-        departValueLabel.setTextFill(Color.BLACK);
+        departValueLabel.setTextFill(Color.BLACK);departValueLabel.setFont(Font.font("Georgia", 12));
 
         grid.add(namaLabel, 0, 0);
         grid.add(namaValueLabel,1, 0 );
@@ -171,9 +176,19 @@ public class ProfileGUI extends Application {
             primaryStage.close();
         });
 
-        root.getChildren().addAll(titleLabel, grid, pinjamBukuButton, kembaliButton);
+        root.getChildren().addAll(titleLabel,userIV , grid, pinjamBukuButton, kembaliButton);
+        Image imagePane = new Image("profile.png");
+        ImageView imagePaneView = new ImageView(imagePane);
+        imagePaneView.setFitWidth(1200);
+        imagePaneView.setFitHeight(600);
+        imagePaneView.setOpacity(1);
+
+        StackPane stackRoot = new StackPane();
+
         mainroot.getChildren().addAll(root, tableView);
-        Scene scene = new Scene(mainroot, 1200, 600);
+        stackRoot.getChildren().addAll(imagePaneView, mainroot);
+
+        Scene scene = new Scene(stackRoot, 1200, 600);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -252,7 +267,7 @@ public class ProfileGUI extends Application {
     }
     private void loadBookFromDB() {
         masterData.clear();
-        String queryPeminjaman = "SELECT * FROM peminjaman WHERE idUser = ?";
+        String queryPeminjaman = "SELECT * FROM peminjaman WHERE idUser = ? AND tanggalKembali IS NULL";
         String queryBook1 = "SELECT * FROM informaticbook WHERE idBuku = ?";
         String queryBook2 = "SELECT * FROM machinebook WHERE idBuku = ?";
 
@@ -300,7 +315,7 @@ public class ProfileGUI extends Application {
     }
 
     private void kembaliBuku(Return book){
-        String peminjamanUpdate = "DELETE FROM peminjaman WHERE idBuku = ?";
+        String peminjamanUpdate = "UPDATE peminjaman SET tanggalkembali = ? WHERE idBuku = ?";
         String updateStokInfor = "UPDATE informaticbook SET stok = stok +1 WHERE idBuku = ?";
         String updateStokMachine = "UPDATE machinebook SEt stok = stok + 1 WHERE idBuku = ?";
 
@@ -308,7 +323,8 @@ public class ProfileGUI extends Application {
             conn.setAutoCommit(false);
 
             try(PreparedStatement pUp = conn.prepareStatement(peminjamanUpdate)){
-                pUp.setString(1, book.getIdBuku());
+                pUp.setDate(1, new java.sql.Date(System.currentTimeMillis()));
+                pUp.setString(2, book.getIdBuku());
                 pUp.executeUpdate();
             }
 

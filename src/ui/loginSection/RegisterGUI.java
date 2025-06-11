@@ -5,6 +5,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -21,15 +23,15 @@ public class RegisterGUI extends Application {
     @Override
     public void start(Stage primaryStage){
         primaryStage.setTitle("Register");
+
         VBox root = new VBox(20);
         root.setPadding(new Insets(40));
         root.setAlignment(Pos.TOP_CENTER);
-        root.setStyle("-fx-background-color: #60B5FF");
 
         //REGISTER LABEL
         Label titleLabel = new Label("MAKE NEW ACCOUNT");
         titleLabel.setTextFill(Color.BLACK);
-        titleLabel.setFont(Font.font("Tahoma", 30));
+        titleLabel.setFont(Font.font("Elephant", 25));
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -43,25 +45,25 @@ public class RegisterGUI extends Application {
 
         //NEW NIM component
         Label newNimLabel = new Label("Insert your NIM: ");
-        newNimLabel.setTextFill(Color.BLACK);
+        newNimLabel.setTextFill(Color.BLACK);newNimLabel.setFont(Font.font("Georgia", 12));
         TextField newNimField = new TextField();
         newNimField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
 
         //NEW NAME component
         Label newNameLabel = new Label("Insert your NAME: ");
-        newNameLabel.setTextFill(Color.BLACK);
+        newNameLabel.setTextFill(Color.BLACK);newNameLabel.setFont(Font.font("Georgia", 12));
         TextField newNameField = new TextField();
         newNameField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
 
         //NEW EMAIL component
         Label newEmailLabel = new Label("Insert your Email: ");
-        newEmailLabel.setTextFill(Color.BLACK);
+        newEmailLabel.setTextFill(Color.BLACK);newEmailLabel.setFont(Font.font("Georgia", 12));
         TextField newEmailField = new TextField();
         newEmailField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
 
         //NEW DEPARTMENT component
         Label newDepLabel = new Label("Insert your DEPARTMENT: ");
-        newDepLabel.setTextFill(Color.BLACK);
+        newDepLabel.setTextFill(Color.BLACK);newDepLabel.setFont(Font.font("Georgia", 12));
         TextField newDepField = new TextField();
         newDepField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
 
@@ -128,8 +130,19 @@ public class RegisterGUI extends Application {
             primaryStage.close();
         });
 
+        Image image1 = new Image("register.png");
+        ImageView bgIV = new ImageView(image1);
+        bgIV.setFitWidth(450);
+        bgIV.setFitHeight(450);
+        bgIV.setPreserveRatio(true);
+        bgIV.setOpacity(0.8);
+
+        StackPane mainroot = new StackPane();
+
         root.getChildren().addAll(titleLabel, perpusLabel, grid, announce, gridButton);
-        Scene scene = new Scene(root, 450, 450);
+        mainroot.getChildren().addAll(bgIV,root);
+
+        Scene scene = new Scene(mainroot, 450, 450);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

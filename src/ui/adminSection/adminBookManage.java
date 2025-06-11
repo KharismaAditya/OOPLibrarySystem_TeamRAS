@@ -1,4 +1,6 @@
 package ui.adminSection;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import ui.loginSection.LoginGUI;
 import ui.programSection.dataBook.Book;
 
@@ -35,10 +37,9 @@ public class adminBookManage extends Application {
         VBox root = new VBox(15);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.TOP_CENTER);
-        root.setStyle("-fx-background-color: #60B5FF;");
 
-        Label titleLabel = new Label("Admin Control");
-        titleLabel.setFont(Font.font("Tahoma", 24));
+        Label titleLabel = new Label("ADMIN CONTROL");
+        titleLabel.setFont(Font.font("Elephant", 25));
         titleLabel.setTextFill(Color.BLACK);
 
         ComboBox<String> bookType = new ComboBox<>();
@@ -184,14 +185,28 @@ public class adminBookManage extends Application {
         });
 
         kembali.setOnAction(e ->{
-            LoginGUI login = new LoginGUI();
-            login.start(new Stage());
+            adminClassManage CM = new adminClassManage();
+            try {
+                CM.start(new Stage());
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
             primaryStage.close();
         });
 
-        root.getChildren().addAll(titleLabel,bookType, tableView, sectionBelow);
+        Image image1 = new Image("bookmanage.png");
+        ImageView bgIV = new ImageView(image1);
+        bgIV.setFitWidth(750);
+        bgIV.setFitHeight(800);
+        bgIV.setPreserveRatio(true);
+        bgIV.setOpacity(0.7);
 
-        Scene scene = new Scene(root, 750, 800);
+        StackPane mainroot = new StackPane();
+
+        root.getChildren().addAll(titleLabel,bookType, tableView, sectionBelow);
+        mainroot.getChildren().addAll(bgIV, root);
+
+        Scene scene = new Scene(mainroot, 750, 800);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
