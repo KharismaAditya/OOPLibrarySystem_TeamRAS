@@ -51,7 +51,7 @@ public class adminBookManage extends Application {
         });
 
         TableView<Book> tableView = new TableView<>();
-        tableView.setPrefWidth(700);
+        tableView.setPrefWidth(720);
 
         TableColumn<Book, String> titleCol = new TableColumn<>("Judul");
         titleCol.setCellValueFactory(new PropertyValueFactory<>("judul"));
@@ -113,26 +113,30 @@ public class adminBookManage extends Application {
         }
         tableView.setItems(masterData);
 
+        Label tambahBukuLabel = new Label("TAMBAH BUKU");
+        tambahBukuLabel.setTextFill(Color.BLACK);
+        tambahBukuLabel.setFont(Font.font("Elephant", 18));
+
         //tambahBuku
         Label judulLabel = new Label("Judul Baku: ");
         judulLabel.setTextFill(Color.BLACK);
         TextField judulField = new TextField();
-        judulField.setPromptText("ENTER BOOK TITLE");judulField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8;");
+        judulField.setPromptText("ENTER BOOK TITLE");judulField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8;");
 
         Label penulisLabel = new Label("Penulis Buku: ");
         penulisLabel.setTextFill(Color.BLACK);
         TextField penulisField = new TextField();
-        penulisField.setPromptText("ENTER AUTHOR NAME");penulisField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8;");
+        penulisField.setPromptText("ENTER AUTHOR NAME");penulisField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8;");
 
         Label stokLabel = new Label("Masukkan Stok buku: ");
         stokLabel.setTextFill(Color.BLACK);
         TextField stokField = new TextField();
-        stokField.setPromptText("ENTER STOCK");stokField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8;");
+        stokField.setPromptText("ENTER STOCK");stokField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8;");
 
         Label idBukuLabel = new Label("Masukkan id Buku: ");
         idBukuLabel.setTextFill(Color.BLACK);
         TextField idBukuField = new TextField();
-        idBukuField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8;");idBukuField.setPromptText("ENTER BOOK ID");
+        idBukuField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8;");idBukuField.setPromptText("ENTER BOOK ID");
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -168,9 +172,14 @@ public class adminBookManage extends Application {
         gridButton.add(tambah, 0, 0);
         gridButton.add(kembali, 0, 1);
 
-        HBox sectionBelow =new HBox(40);
+        HBox sectionBelow =new HBox(10);
         sectionBelow.getChildren().addAll(grid, gridButton);
         sectionBelow.setAlignment(Pos.CENTER);
+
+        VBox addSection = new VBox(10);
+        addSection.setPadding(new Insets(0, 0, 0, 20));
+        addSection.setAlignment(Pos.CENTER_LEFT);
+        addSection.getChildren().addAll(tambahBukuLabel, sectionBelow);
 
 
         tambah.setOnAction(e ->{
@@ -196,17 +205,23 @@ public class adminBookManage extends Application {
 
         Image image1 = new Image("bookmanage.png");
         ImageView bgIV = new ImageView(image1);
-        bgIV.setFitWidth(750);
-        bgIV.setFitHeight(800);
+        bgIV.setFitWidth(1200);
+        bgIV.setFitHeight(600);
         bgIV.setPreserveRatio(true);
-        bgIV.setOpacity(0.7);
+        bgIV.setOpacity(0.9);
 
         StackPane mainroot = new StackPane();
 
-        root.getChildren().addAll(titleLabel,bookType, tableView, sectionBelow);
+        HBox pageUnder = new HBox(10);
+        pageUnder.setPadding(new Insets(10));
+        pageUnder.setAlignment(Pos.CENTER);
+        pageUnder.getChildren().addAll(tableView, addSection);
+
+        root.getChildren().addAll(titleLabel,bookType, pageUnder);
         mainroot.getChildren().addAll(bgIV, root);
 
-        Scene scene = new Scene(mainroot, 750, 800);
+
+        Scene scene = new Scene(mainroot, 1200, 600);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -249,14 +264,14 @@ public class adminBookManage extends Application {
 
     private void deleteBook(Book book, String query){
         String getQuery = "DELETE FROM " + query + " WHERE idBuku = ?";
-        String getDelete = "DELETE FROM peminjaman WHERE idBuku = " + book.getIdBuku();
+        String getDelete = "DELETE FROM peminjaman WHERE idBuku = ?" ;
         try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
             PreparedStatement stmt = conn.prepareStatement(getQuery)){
             stmt.setString(1, book.getIdBuku());
             stmt.executeUpdate();
             try (PreparedStatement stmt1 = conn.prepareStatement(getDelete)){
+                stmt1.setString(1, book.getIdBuku());
                 stmt1.executeUpdate();
-
             }
             loadBook(query);
         }catch (SQLException e){

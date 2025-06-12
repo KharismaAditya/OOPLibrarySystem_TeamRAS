@@ -42,7 +42,7 @@ public class adminClassManage extends Application {
         titleLabel.setTextFill(Color.BLACK);
 
         TableView<students> tableView = new TableView<>();
-        tableView.setPrefWidth(950);
+        tableView.setPrefWidth(920);
 
         TableColumn<students, String> titleCol = new TableColumn<>("ID STUDENTS");
         titleCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
@@ -86,7 +86,10 @@ public class adminClassManage extends Application {
                 }
             }
         });
+        tableView.getColumns().clear();
 
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableView.setTableMenuButtonVisible(false);
         tableView.getColumns().addAll(titleCol, authorCol, stokCol, idbookCol, deleteCol);
         loadData();
         tableView.setItems(masterData);
@@ -125,7 +128,7 @@ public class adminClassManage extends Application {
 
         Image image1 = new Image("admin1.png");
         ImageView bgIV = new ImageView(image1);
-        bgIV.setFitWidth(1000);
+        bgIV.setFitWidth(1200);
         bgIV.setFitHeight(600);
         bgIV.setPreserveRatio(false);
         bgIV.setOpacity(0.7);
@@ -134,7 +137,7 @@ public class adminClassManage extends Application {
 
         root.getChildren().addAll(titleLabel, tableView, tombol);
         mainroot.getChildren().addAll(bgIV, root);
-        Scene scene = new Scene(mainroot, 1000, 600);
+        Scene scene = new Scene(mainroot, 1200, 600);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -161,14 +164,17 @@ public class adminClassManage extends Application {
     }
 
     private void deleteBook(students std){
-        String getQuery = "DELETE FROM studentsdata WHERE idUser = ?";
-        String getDelete = "DELETE FROM peminjaman WHERE idUser = " + std.getUserId();
+        String getQuery = "DELETE FROM peminjaman WHERE idUser = ?";
+        String getDelete = "DELETE FROM studentsdata WHERE idUser = ?";
         try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
             PreparedStatement stmt = conn.prepareStatement(getQuery)){
             stmt.setString(1, std.getUserId());
             stmt.executeUpdate();
             try (PreparedStatement stmt1 = conn.prepareStatement(getDelete)){
+                stmt1.setString(1, std.getUserId());
                 stmt1.executeUpdate();
+            }catch (SQLException ex){
+                loadData();
             }
             loadData();
         }catch (SQLException e){

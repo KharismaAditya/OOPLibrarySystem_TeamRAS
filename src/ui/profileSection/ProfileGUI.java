@@ -337,6 +337,12 @@ public class ProfileGUI extends Application {
                 hMachine.setString(1, book.getIdBuku());
                 hMachine.executeUpdate();
             }
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Pengembalian Berhasil");
+            alert.setHeaderText(null);
+            alert.setContentText("Anda berhasil mengembalikan buku \"" + book.getJudul() + "\".");
+            alert.showAndWait();
+
             conn.commit();
 
         }catch (SQLException e){

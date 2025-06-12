@@ -47,25 +47,25 @@ public class RegisterGUI extends Application {
         Label newNimLabel = new Label("Insert your NIM: ");
         newNimLabel.setTextFill(Color.BLACK);newNimLabel.setFont(Font.font("Georgia", 12));
         TextField newNimField = new TextField();
-        newNimField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
+        newNimField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8");
 
         //NEW NAME component
         Label newNameLabel = new Label("Insert your NAME: ");
         newNameLabel.setTextFill(Color.BLACK);newNameLabel.setFont(Font.font("Georgia", 12));
         TextField newNameField = new TextField();
-        newNameField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
+        newNameField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8");
 
         //NEW EMAIL component
         Label newEmailLabel = new Label("Insert your Email: ");
         newEmailLabel.setTextFill(Color.BLACK);newEmailLabel.setFont(Font.font("Georgia", 12));
         TextField newEmailField = new TextField();
-        newEmailField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
+        newEmailField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8");
 
         //NEW DEPARTMENT component
         Label newDepLabel = new Label("Insert your DEPARTMENT: ");
         newDepLabel.setTextFill(Color.BLACK);newDepLabel.setFont(Font.font("Georgia", 12));
         TextField newDepField = new TextField();
-        newDepField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8");
+        newDepField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8");
 
 
         grid.add(newNimLabel, 0, 0);
