@@ -1,5 +1,5 @@
-
 package ui.programSection.dataBook;
+import Properties.databaseConnect;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -10,22 +10,22 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import method.TableLoad;
+import model.Book;
 import ui.profileSection.ProfileGUI;
 
 
+import java.io.IOException;
 import java.sql.*;
 
-public class displaybook extends Application {
+public class displaybook extends Application implements TableLoad {
 
-    private static final String dbURL = "jdbc:mysql://127.0.0.1:3306/databook";
-    private static final String dbUser = "root";
-    private static final String dbPass = "a2001234";
+    databaseConnect db = new databaseConnect();
     private String mhsQuery;
 
     public String getMhsQuery(){
@@ -105,7 +105,7 @@ public class displaybook extends Application {
 
         tableView.getColumns().addAll(titleCol, authorCol, stokCol,idbookCol, borrowCol);
 
-        loadBooksFromDB();
+        loadBookDB();
 
         FilteredList<Book> filteredData = new FilteredList<>(masterData, b -> true);
 
@@ -146,7 +146,7 @@ public class displaybook extends Application {
         bgIV.setFitWidth(750);
         bgIV.setFitHeight(650);
         bgIV.setPreserveRatio(true);
-        bgIV.setOpacity(0.8);
+        bgIV.setOpacity(0.9);
 
         StackPane mainroot = new StackPane();
         mainroot.getChildren().addAll(bgIV, root);
@@ -189,7 +189,7 @@ public class displaybook extends Application {
         String updateStokMesin =
                 "UPDATE machinebook SET stok = stok - 1 WHERE idBuku = ? AND stok > 0";
 
-        try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass)) {
+        try (Connection conn = db.getConnection()) {
             conn.setAutoCommit(false);
 
             try {
@@ -229,29 +229,29 @@ public class displaybook extends Application {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Peminjaman Berhasil");
                 alert.setHeaderText(null);
-                alert.setContentText("Anda berhasil meminjam buku \"" + book.getJudul() + "\".");
+                alert.setContentText("Anda berhasil meminjam buku \"" + book.getJudul() + "\".\n");
                 alert.showAndWait();
-                loadBooksFromDB();
+                loadBookDB();
 
             } catch (SQLException e) {
                 conn.rollback();
                 e.printStackTrace();
                 showError("Terjadi kesalahan saat meminjam buku.");
             }
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
             showError("Tidak dapat terhubung ke database.");
         }
     }
 
 
-
-    private void loadBooksFromDB() {
+    @Override
+    public void loadBookDB() {
         masterData.clear();
         String queryInformatika = "SELECT * FROM informaticbook";
         String queryMesin = "SELECT * FROM machinebook";
 
-        try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass)) {
+        try(Connection conn = db.getConnection()) {
             try(PreparedStatement ps = conn.prepareStatement(queryInformatika);
                 ResultSet rs = ps.executeQuery()) {
                 while(rs.next()){
@@ -273,9 +273,14 @@ public class displaybook extends Application {
                 }
             }
 
-        } catch(SQLException e){
+        } catch(IOException | SQLException e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void loadBookDB(String query) {
+
     }
 }
 

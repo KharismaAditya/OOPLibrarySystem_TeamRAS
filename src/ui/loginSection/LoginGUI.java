@@ -2,6 +2,7 @@ package ui.loginSection;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import ui.adminSection.*;
+import Properties.databaseConnect;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -14,15 +15,13 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import ui.profileSection.ProfileGUI;
 
+import java.io.IOException;
 import java.sql.*;
 
 
 
 public class LoginGUI extends Application {
-
-    private static final String dbURL = "jdbc:mysql://127.0.0.1:3306/databook";
-    private static final String dbUser = "root";
-    private static final String dbPass = "a2001234";
+    databaseConnect db = new databaseConnect();
 
 
     @Override
@@ -153,13 +152,13 @@ public class LoginGUI extends Application {
 
     private boolean checkNIM(String NIM){
         String query = "SELECT * FROM studentsdata WHERE idUser = ?";
-        try(Connection conn = DriverManager.getConnection(dbURL,dbUser,dbPass);
+        try(Connection conn = db.getConnection();
             PreparedStatement stms = conn.prepareStatement(query)){
 
             stms.setString(1, NIM);
             ResultSet rs = stms.executeQuery();
             return rs.next();
-        }catch (SQLException e){
+        }catch (SQLException  |IOException e){
             e.printStackTrace();
         }
         return false;

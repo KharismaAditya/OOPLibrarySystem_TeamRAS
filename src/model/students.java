@@ -1,4 +1,4 @@
-package ui.adminSection;
+package model;
 
 public class students {
     private String userId;

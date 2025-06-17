@@ -1,4 +1,7 @@
 package ui.profileSection;
+import method.TableLoad;
+import model.*;
+import Properties.databaseConnect;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -20,13 +23,11 @@ import javafx.stage.Stage;
 import ui.loginSection.LoginGUI;
 import ui.programSection.dataBook.*;
 
+import java.io.IOException;
 import java.sql.*;
 
-public class ProfileGUI extends Application {
-
-    private static final String dbURL = "jdbc:mysql://127.0.0.1:3306/databook";
-    private static final String dbUser  = "root";
-    private static final String dbPass = "a2001234";
+public class ProfileGUI extends Application implements TableLoad {
+    databaseConnect db = new databaseConnect();
 
     private String idUser ;
 
@@ -80,7 +81,7 @@ public class ProfileGUI extends Application {
                 btn.setOnAction(e -> {
                     Return book = getTableView().getItems().get(getIndex());
                     kembaliBuku(book);
-                    loadBookFromDB();
+                    loadBookDB();
                 });
             }
 
@@ -98,7 +99,7 @@ public class ProfileGUI extends Application {
 
 
         tableView.getColumns().addAll(idBorCol, idBukuCol, tglPinjamCol, judulCol, penulisCol, returnCol);
-        loadBookFromDB();
+        loadBookDB();
         FilteredList<Return> filteredData = new FilteredList<>(masterData, b -> true);
         tableView.setItems(filteredData);
 
@@ -181,7 +182,7 @@ public class ProfileGUI extends Application {
         ImageView imagePaneView = new ImageView(imagePane);
         imagePaneView.setFitWidth(1200);
         imagePaneView.setFitHeight(600);
-        imagePaneView.setOpacity(1);
+        imagePaneView.setOpacity(0.9);
 
         StackPane stackRoot = new StackPane();
 
@@ -196,7 +197,7 @@ public class ProfileGUI extends Application {
 
     private String getNama(String idUser ) {
         String query = "SELECT nameUser FROM studentsdata WHERE idUser  = ?";
-        try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+        try (Connection conn = db.getConnection();
              PreparedStatement stms = conn.prepareStatement(query)) {
 
             stms.setString(1, idUser);
@@ -206,7 +207,7 @@ public class ProfileGUI extends Application {
             } else {
                 return "Nama tidak ditemukan";
             }
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
             return "Error: " + e.getMessage();
         }
@@ -214,7 +215,7 @@ public class ProfileGUI extends Application {
 
     private String getNIM(String idUser){
         String query = "SELECT idUser FROM studentsdata WHERE idUser = ?";
-        try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+        try(Connection conn = db.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)){
 
             stmt.setString(1, idUser);
@@ -224,7 +225,7 @@ public class ProfileGUI extends Application {
             }else{
                 return "NIM tidak ditemukan";
             }
-        }catch (SQLException e){
+        }catch (IOException | SQLException e){
             e.printStackTrace();
             return "Error: " + e.getMessage();
         }
@@ -232,7 +233,7 @@ public class ProfileGUI extends Application {
 
     private String getEmail(String idUser){
         String query = "SELECT email FROM studentsdata WHERE idUser  = ?";
-        try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+        try (Connection conn = db.getConnection();
              PreparedStatement stms = conn.prepareStatement(query)) {
 
             stms.setString(1, idUser);
@@ -242,7 +243,7 @@ public class ProfileGUI extends Application {
             } else {
                 return "Email tidak ditemukan";
             }
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
             return "Error: " + e.getMessage();
         }
@@ -250,7 +251,7 @@ public class ProfileGUI extends Application {
 
     private String getDepart(String idUser){
         String query = "SELECT jurusan FROM studentsdata WHERE idUser  = ?";
-        try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+        try (Connection conn = db.getConnection();
              PreparedStatement stms = conn.prepareStatement(query)) {
 
             stms.setString(1, idUser);
@@ -260,18 +261,19 @@ public class ProfileGUI extends Application {
             } else {
                 return "Jurusan tidak ditemukan";
             }
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
             return "Error: " + e.getMessage();
         }
     }
-    private void loadBookFromDB() {
+    @Override
+    public void loadBookDB() {
         masterData.clear();
         String queryPeminjaman = "SELECT * FROM peminjaman WHERE idUser = ? AND tanggalKembali IS NULL";
         String queryBook1 = "SELECT * FROM informaticbook WHERE idBuku = ?";
         String queryBook2 = "SELECT * FROM machinebook WHERE idBuku = ?";
 
-        try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass)) {
+        try (Connection conn = db.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(queryPeminjaman)) {
                 ps.setString(1, idUser);
                 ResultSet rs = ps.executeQuery();
@@ -309,9 +311,14 @@ public class ProfileGUI extends Application {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void loadBookDB(String query) {
+
     }
 
     private void kembaliBuku(Return book){
@@ -319,7 +326,7 @@ public class ProfileGUI extends Application {
         String updateStokInfor = "UPDATE informaticbook SET stok = stok +1 WHERE idBuku = ?";
         String updateStokMachine = "UPDATE machinebook SEt stok = stok + 1 WHERE idBuku = ?";
 
-        try(Connection conn = DriverManager.getConnection(dbURL,dbUser,dbPass)){
+        try(Connection conn = db.getConnection()){
             conn.setAutoCommit(false);
 
             try(PreparedStatement pUp = conn.prepareStatement(peminjamanUpdate)){
@@ -345,7 +352,7 @@ public class ProfileGUI extends Application {
 
             conn.commit();
 
-        }catch (SQLException e){
+        }catch (IOException | SQLException e){
             e.printStackTrace();
         }
     }

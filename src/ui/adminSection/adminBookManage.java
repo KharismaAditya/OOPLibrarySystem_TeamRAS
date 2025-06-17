@@ -1,13 +1,13 @@
 package ui.adminSection;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import ui.loginSection.LoginGUI;
-import ui.programSection.dataBook.Book;
+import method.TableLoad;
+import model.Book;
+import Properties.databaseConnect;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -19,13 +19,12 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 
+import java.io.IOException;
 import java.sql.*;
 
 
-public class adminBookManage extends Application {
-    private static final String dbURL = "jdbc:mysql://127.0.0.1:3306/databook";
-    private static final String dbUser = "root";
-    private static final String dbPass = "a2001234";
+public class adminBookManage extends Application implements TableLoad {
+    databaseConnect db = new databaseConnect();
 
     private ObservableList<Book> masterData = FXCollections.observableArrayList();
 
@@ -47,7 +46,7 @@ public class adminBookManage extends Application {
         bookType.setValue("Informatika");
         bookType.valueProperty().addListener((obs, oldVal, newVal) -> {
             String tableName = newVal.equals("Informatika") ? "informaticbook" : "machinebook";
-            loadBook(tableName);
+            loadBookDB(tableName);
         });
 
         TableView<Book> tableView = new TableView<>();
@@ -106,10 +105,10 @@ public class adminBookManage extends Application {
         String queryBook = "";
         if(bookType.getValue().equals("Informatika")){
             queryBook = "informaticbook";
-            loadBook(queryBook);
+            loadBookDB(queryBook);
         }else if(bookType.getValue().equals("Teknik Mesin")){
             queryBook = "machinebook";
-            loadBook(queryBook);
+            loadBookDB(queryBook);
         }
         tableView.setItems(masterData);
 
@@ -191,6 +190,10 @@ public class adminBookManage extends Application {
                 query = "machinebook";
             }
             addBook(query, judulField.getText(), penulisField.getText(), stokBuku, idBukuField.getText());
+            judulField.clear();
+            penulisField.clear();
+            stokField.clear();
+            idBukuField.clear();
         });
 
         kembali.setOnAction(e ->{
@@ -227,11 +230,17 @@ public class adminBookManage extends Application {
         primaryStage.show();
     }
 
-    private void loadBook(String query){
+    @Override
+    public void loadBookDB() {
+
+    }
+
+    @Override
+    public void loadBookDB(String query){
         masterData.clear();
         String queryInformatika = "SELECT * FROM " + query;
 
-        try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass)) {
+        try(Connection conn = db.getConnection()) {
             try(PreparedStatement ps = conn.prepareStatement(queryInformatika);
                 ResultSet rs = ps.executeQuery()) {
                 while(rs.next()){
@@ -242,22 +251,27 @@ public class adminBookManage extends Application {
                     masterData.add(new Book(judul, penulis, stok, idBuku));
                 }
             }
-        } catch(SQLException e){
+        } catch(IOException | SQLException e){
             e.printStackTrace();
         }
     }
 
     private void addBook(String query, String judul, String penulis, int stok, String idBuku){
         String getQuery = "INSERT INTO " + query + " (judul, penulis, stok, idBuku) VALUES (?, ?, ?, ?)";
-        try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+        try(Connection conn = db.getConnection();
             PreparedStatement stmt = conn.prepareStatement(getQuery)){
             stmt.setString(1, judul);
             stmt.setString(2, penulis);
             stmt.setInt(3, stok);
             stmt.setString(4, idBuku);
             stmt.executeUpdate();
-            loadBook(query);
-        }catch (SQLException e){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Penambahan buku");
+            alert.setHeaderText(null);
+            alert.setContentText("Buku berhasil ditambahkan");
+            alert.showAndWait();
+            loadBookDB(query);
+        }catch (IOException | SQLException e){
             e.printStackTrace();
         }
     }
@@ -265,7 +279,7 @@ public class adminBookManage extends Application {
     private void deleteBook(Book book, String query){
         String getQuery = "DELETE FROM " + query + " WHERE idBuku = ?";
         String getDelete = "DELETE FROM peminjaman WHERE idBuku = ?" ;
-        try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+        try(Connection conn = db.getConnection();
             PreparedStatement stmt = conn.prepareStatement(getQuery)){
             stmt.setString(1, book.getIdBuku());
             stmt.executeUpdate();
@@ -273,8 +287,13 @@ public class adminBookManage extends Application {
                 stmt1.setString(1, book.getIdBuku());
                 stmt1.executeUpdate();
             }
-            loadBook(query);
-        }catch (SQLException e){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Penghapusan Buku");
+            alert.setHeaderText(null);
+            alert.setContentText("Buku berhasil dihapus");
+            alert.showAndWait();
+            loadBookDB(query);
+        }catch (IOException | SQLException e){
             e.printStackTrace();
         }
     }

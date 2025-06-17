@@ -1,4 +1,5 @@
 package ui.loginSection;
+import Properties.databaseConnect;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -12,13 +13,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.*;
 
 public class RegisterGUI extends Application {
-
-    private static final String dbURL = "jdbc:mysql://127.0.0.1:3306/databook";
-    private static final String dbUser = "root";
-    private static final String dbPass = "a2001234";
+    databaseConnect db = new databaseConnect();
 
     @Override
     public void start(Stage primaryStage){
@@ -113,15 +112,18 @@ public class RegisterGUI extends Application {
 
         addButton.setOnAction(e-> {
             String NIM = newNimField.getText();
-            String Nama = newEmailField.getText();
+            String Nama = newNameField.getText();
             String email = newEmailField.getText();
             String department = newDepField.getText();
 
-            if(!checkUser(NIM)){
-                addUser(NIM, Nama, email, department, announce);
-            }else {
+            if (NIM.isEmpty() || Nama.isEmpty() || email.isEmpty() || department.isEmpty()) {
                 announce.setTextFill(Color.web("#f44336"));
-                announce.setText("NIM Already used.");
+                announce.setText("INFORMATION CAN'T BE EMPTY");
+            } else if (checkUser(NIM)) {
+                announce.setTextFill(Color.web("#f44336"));
+                announce.setText("NIM already used.");
+            } else {
+                addUser(NIM, Nama, email, department, announce);
             }
         });
         bckButton.setOnAction(e -> {
@@ -150,13 +152,13 @@ public class RegisterGUI extends Application {
 
     private boolean checkUser(String NIM){
         String query = "SELECT * FROM studentsdata WHERE idUser = ?";
-        try(Connection conn = DriverManager.getConnection(dbURL,dbUser,dbPass);
+        try(Connection conn = db.getConnection();
             PreparedStatement stms = conn.prepareStatement(query)){
 
             stms.setString(1, NIM);
             ResultSet rs = stms.executeQuery();
             return rs.next();
-        }catch (SQLException e){
+        }catch (SQLException | IOException e){
             e.printStackTrace();
         }
         return false;
@@ -164,7 +166,7 @@ public class RegisterGUI extends Application {
 
     private void addUser(String nim, String nama, String email, String department, Label announce){
         String query = "INSERT INTO studentsdata (idUser, nameUser, email, jurusan) VALUES (?, ?, ?, ?)";
-        try(Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+        try(Connection conn = db.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)){
             stmt.setString(1, nim);
             stmt.setString(2, nama);
@@ -178,7 +180,7 @@ public class RegisterGUI extends Application {
                 announce.setText("Profile added successfully");
 
             }
-        }catch (SQLException e){
+        }catch (SQLException | IOException e){
             e.printStackTrace();
         }
     }

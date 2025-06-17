@@ -1,4 +1,4 @@
-package ui.programSection.dataBook;
+package model;
 
 import java.util.Date;
 
