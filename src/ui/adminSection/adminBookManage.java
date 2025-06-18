@@ -183,13 +183,36 @@ public class adminBookManage extends Application implements TableLoad {
 
         tambah.setOnAction(e ->{
             String query = "";
-            int stokBuku = Integer.parseInt(stokField.getText());
             if(bookType.getValue().equals("Informatika")){
                 query = "informaticbook";
             }else if(bookType.getValue().equals("Teknik Mesin")){
                 query = "machinebook";
             }
-            addBook(query, judulField.getText(), penulisField.getText(), stokBuku, idBukuField.getText());
+            String Judul = judulField.getText();
+            String idBuku = idBukuField.getText();
+            int stokBuku;
+            try {
+                stokBuku = Integer.parseInt(stokField.getText());
+                if (stokBuku < 0) throw new NumberFormatException();
+            } catch (NumberFormatException ex) {
+                errorAnnounce("Stok harus berupa angka positif");
+                judulField.clear();
+                penulisField.clear();
+                stokField.clear();
+                idBukuField.clear();
+                return;
+            }
+
+            if (Judul.isEmpty() || penulisField.getText().isEmpty() || stokField.getText().isEmpty() || idBuku.isEmpty()) {
+                errorAnnounce("Data harus diisi lengkap");
+            } else if (checkJudul(query, Judul)) {
+                errorAnnounce("Judul Buku sudah tersedia");
+            } else if (checkbookId(query, idBuku)) {
+                errorAnnounce("id buku sudah terpakai");
+            } else {
+                addBook(query, Judul, penulisField.getText(), stokBuku, idBuku);
+            }
+
             judulField.clear();
             penulisField.clear();
             stokField.clear();
@@ -296,5 +319,41 @@ public class adminBookManage extends Application implements TableLoad {
         }catch (IOException | SQLException e){
             e.printStackTrace();
         }
+    }
+
+    private boolean checkJudul(String query, String judul){
+        String query1 = "SELECT * FROM " + query + " WHERE judul = ?";
+        try(Connection conn = db.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query1)){
+
+            stmt.setString(1, judul);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        }catch (IOException | SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean checkbookId(String query, String bookId){
+        String query1 = "SELECT * FROM " + query + " WHERE idBuku = ?";
+        try(Connection conn = db.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query1)){
+
+            stmt.setString(1, bookId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        }catch (IOException | SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void errorAnnounce(String message){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("ERROR");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

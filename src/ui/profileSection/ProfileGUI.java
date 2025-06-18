@@ -182,7 +182,7 @@ public class ProfileGUI extends Application implements TableLoad {
         ImageView imagePaneView = new ImageView(imagePane);
         imagePaneView.setFitWidth(1200);
         imagePaneView.setFitHeight(600);
-        imagePaneView.setOpacity(0.9);
+        imagePaneView.setOpacity(0.8);
 
         StackPane stackRoot = new StackPane();
 

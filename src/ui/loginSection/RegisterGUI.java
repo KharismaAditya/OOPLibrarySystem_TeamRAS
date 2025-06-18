@@ -119,9 +119,9 @@ public class RegisterGUI extends Application {
             if (NIM.isEmpty() || Nama.isEmpty() || email.isEmpty() || department.isEmpty()) {
                 announce.setTextFill(Color.web("#f44336"));
                 announce.setText("INFORMATION CAN'T BE EMPTY");
-            } else if (checkUser(NIM)) {
+            } else if (checkUser(NIM) || checkName(Nama)) {
                 announce.setTextFill(Color.web("#f44336"));
-                announce.setText("NIM already used.");
+                announce.setText("Some of Data already used.");
             } else {
                 addUser(NIM, Nama, email, department, announce);
             }
@@ -159,6 +159,20 @@ public class RegisterGUI extends Application {
             ResultSet rs = stms.executeQuery();
             return rs.next();
         }catch (SQLException | IOException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean checkName(String nama){
+        String query = "SELECT * FROM studentsdata WHERE nameUser = ?";
+        try(Connection conn = db.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)){
+
+            stmt.setString(1, nama);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        }catch (IOException | SQLException e){
             e.printStackTrace();
         }
         return false;
