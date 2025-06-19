@@ -190,6 +190,11 @@ public class adminBookManage extends Application implements TableLoad {
             }
             String Judul = judulField.getText();
             String idBuku = idBukuField.getText();
+            if (Judul.isEmpty() || penulisField.getText().isEmpty() || stokField.getText().isEmpty() || idBuku.isEmpty()) {
+                errorAnnounce("Data harus diisi lengkap");
+                return;
+            }
+
             int stokBuku;
             try {
                 stokBuku = Integer.parseInt(stokField.getText());
@@ -203,9 +208,7 @@ public class adminBookManage extends Application implements TableLoad {
                 return;
             }
 
-            if (Judul.isEmpty() || penulisField.getText().isEmpty() || stokField.getText().isEmpty() || idBuku.isEmpty()) {
-                errorAnnounce("Data harus diisi lengkap");
-            } else if (checkJudul(query, Judul)) {
+            if (checkJudul(query, Judul)) {
                 errorAnnounce("Judul Buku sudah tersedia");
             } else if (checkbookId(query, idBuku)) {
                 errorAnnounce("id buku sudah terpakai");
