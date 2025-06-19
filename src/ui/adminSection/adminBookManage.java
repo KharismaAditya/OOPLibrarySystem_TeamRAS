@@ -211,7 +211,7 @@ public class adminBookManage extends Application implements TableLoad {
             if (checkJudul(query, Judul)) {
                 errorAnnounce("Judul Buku sudah tersedia");
             } else if (checkbookId(query, idBuku)) {
-                errorAnnounce("id buku sudah terpakai");
+                errorAnnounce("Id buku sudah terpakai");
             } else {
                 addBook(query, Judul, penulisField.getText(), stokBuku, idBuku);
             }
