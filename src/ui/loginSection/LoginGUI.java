@@ -67,7 +67,7 @@ public class LoginGUI extends Application {
         Label nimLabel = new Label("NIM: ");
         nimLabel.setTextFill(Color.BLACK);nimLabel.setFont(Font.font("Impact", 12));
         TextField nimField = new TextField();
-        nimField.setPromptText("Enter your NIM");nimField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8;");
+        nimField.setPromptText("Masukkan NIM");nimField.setStyle("-fx-background-color: #AFDDFF; -fx-background-radius: 5; -fx-padding: 8;");
 
         grid.add(nimLabel, 0, 0);
         grid.add(nimField,1, 0 );
@@ -106,7 +106,7 @@ public class LoginGUI extends Application {
             String NIM = nimField.getText();
             if(NIM.isEmpty()){
                 announce.setTextFill(Color.RED);
-                announce.setText("NIM cannot be Empty");
+                announce.setText("NIM tidak boleh kosong");
                 return;
             }
 
@@ -123,14 +123,14 @@ public class LoginGUI extends Application {
 
             if(checkNIM(NIM)){
                 announce.setTextFill(Color.web("#2ecc71"));
-                announce.setText("Login successful!");
+                announce.setText("Login Berhasil!");
                 ProfileGUI userLogin = new ProfileGUI(NIM);
 
                 userLogin.start(new Stage());
                 primaryStage.close();
             }else{
                 announce.setTextFill(Color.web("#f44336"));
-                announce.setText("Invalid username or password.");
+                announce.setText("Usernama atau Password tidak valid");
             }
 
 

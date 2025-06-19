@@ -117,7 +117,7 @@ public class adminBookManage extends Application implements TableLoad {
         tambahBukuLabel.setFont(Font.font("Elephant", 18));
 
         //tambahBuku
-        Label judulLabel = new Label("Judul Baku: ");
+        Label judulLabel = new Label("Judul Buku: ");
         judulLabel.setTextFill(Color.BLACK);
         TextField judulField = new TextField();
         judulField.setPromptText("ENTER BOOK TITLE");judulField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8;");

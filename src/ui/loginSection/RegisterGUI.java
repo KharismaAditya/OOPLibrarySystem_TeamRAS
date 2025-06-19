@@ -28,7 +28,7 @@ public class RegisterGUI extends Application {
         root.setAlignment(Pos.TOP_CENTER);
 
         //REGISTER LABEL
-        Label titleLabel = new Label("MAKE NEW ACCOUNT");
+        Label titleLabel = new Label("BUAT AKUN BARU");
         titleLabel.setTextFill(Color.BLACK);
         titleLabel.setFont(Font.font("Elephant", 25));
 
@@ -43,25 +43,25 @@ public class RegisterGUI extends Application {
         perpusLabel.setFont(Font.font("Impact", 14));
 
         //NEW NIM component
-        Label newNimLabel = new Label("Insert your NIM: ");
+        Label newNimLabel = new Label("Masukkan NIM: ");
         newNimLabel.setTextFill(Color.BLACK);newNimLabel.setFont(Font.font("Georgia", 12));
         TextField newNimField = new TextField();
         newNimField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8");
 
         //NEW NAME component
-        Label newNameLabel = new Label("Insert your NAME: ");
+        Label newNameLabel = new Label("Masukkan NAMA: ");
         newNameLabel.setTextFill(Color.BLACK);newNameLabel.setFont(Font.font("Georgia", 12));
         TextField newNameField = new TextField();
         newNameField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8");
 
         //NEW EMAIL component
-        Label newEmailLabel = new Label("Insert your Email: ");
+        Label newEmailLabel = new Label("Masukkan Email: ");
         newEmailLabel.setTextFill(Color.BLACK);newEmailLabel.setFont(Font.font("Georgia", 12));
         TextField newEmailField = new TextField();
         newEmailField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8");
 
         //NEW DEPARTMENT component
-        Label newDepLabel = new Label("Insert your DEPARTMENT: ");
+        Label newDepLabel = new Label("Masukkan Jurusan anda: ");
         newDepLabel.setTextFill(Color.BLACK);newDepLabel.setFont(Font.font("Georgia", 12));
         TextField newDepField = new TextField();
         newDepField.setStyle("-fx-background-color: WHITE; -fx-background-radius: 5; -fx-padding: 8");
@@ -118,10 +118,10 @@ public class RegisterGUI extends Application {
 
             if (NIM.isEmpty() || Nama.isEmpty() || email.isEmpty() || department.isEmpty()) {
                 announce.setTextFill(Color.web("#f44336"));
-                announce.setText("INFORMATION CAN'T BE EMPTY");
+                announce.setText("INFORMASI tidak boleh kosong");
             } else if (checkUser(NIM) || checkName(Nama)) {
                 announce.setTextFill(Color.web("#f44336"));
-                announce.setText("Some of Data already used.");
+                announce.setText("Beberapa data sudah terpakai");
             } else {
                 addUser(NIM, Nama, email, department, announce);
             }
