@@ -1,7 +1,7 @@
 package Properties;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -10,8 +10,12 @@ import java.util.Properties;
 public class databaseConnect {
     public Connection getConnection() throws IOException, SQLException {
         Properties props = new Properties();
-        FileInputStream fis = new FileInputStream("D:/ADIT/MAK AKU KULIAH/SMT 2/PBO/PBO_A_KHARISMA_200/TUGAS AKHIR_PBO_KHARISMA ADITYA_200/src/com/tugasakhir/bookdata/accessible/config.properties");
-        props.load(fis);
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) {
+                throw new IOException("config.properties not found in resources folder");
+            }
+            props.load(input);
+        }
 
         String url = props.getProperty("db.url");
         String user = props.getProperty("db.user");
